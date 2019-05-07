@@ -254,7 +254,7 @@ namespace MLAgents
         private int ReadArgs()
         {
             var args = System.Environment.GetCommandLineArgs();
-            var inputPort = "";
+            var inputPort = "5005";
             for (var i = 0; i < args.Length; i++)
             {
                 if (args[i] == "--port")
@@ -287,29 +287,13 @@ namespace MLAgents
             }
 
             // Try to launch the communicator by usig the arguments passed at launch
-            try
+            if (controlledBrains.ToList().Count > 0)
             {
                 communicator = new RPCCommunicator(
                     new CommunicatorParameters
                     {
                         port = ReadArgs()
                     });
-            }
-            // If it fails, we check if there are any external brains in the scene
-            // If there are : Launch the communicator on the default port
-            // If there arn't, there is no need for a communicator and it is set
-            // to null
-            catch
-            {
-                communicator = null;
-                if (controlledBrains.ToList().Count > 0)
-                {
-                    communicator = new RPCCommunicator(
-                        new CommunicatorParameters
-                        {
-                            port = 5005
-                        });
-                }
             }
 
             brainBatcher = new Batcher(communicator);
