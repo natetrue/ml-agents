@@ -205,7 +205,7 @@ class UnityEnvironment(BaseUnityEnvironment):
                          '--port', str(self.port)])
                 else:
                     self.proc1 = subprocess.Popen(
-                        [launch_string, '--port', str(self.port)])
+                        [launch_string, '-batchmode', '-screen-fullscreen', '0', '--port', str(self.port)])
             else:
                 """
                 Comments for future maintenance:
