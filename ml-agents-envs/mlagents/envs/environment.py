@@ -464,6 +464,8 @@ class UnityEnvironment(BaseUnityEnvironment):
         self.communicator.close()
         if self.proc1 is not None:
             self.proc1.kill()
+            self.proc1.wait()
+            self.proc1 = None
 
     @classmethod
     def _flatten(cls, arr) -> List[float]:
