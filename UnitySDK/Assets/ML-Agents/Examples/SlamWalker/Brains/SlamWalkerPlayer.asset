@@ -15,7 +15,7 @@ MonoBehaviour:
   brainParameters:
     vectorObservationSize: 6
     numStackedVectorObservations: 1
-    vectorActionSize: 03000000
+    vectorActionSize: 04000000
     cameraResolutions:
     - width: 256
       height: 144
@@ -24,9 +24,10 @@ MonoBehaviour:
       height: 144
       blackAndWhite: 0
     vectorActionDescriptions:
-    - 
-    - 
-    - 
+    - Forward
+    - Right
+    - Turn
+    - Reset
     vectorActionSpaceType: 1
   keyContinuousPlayerActions:
   - key: 273

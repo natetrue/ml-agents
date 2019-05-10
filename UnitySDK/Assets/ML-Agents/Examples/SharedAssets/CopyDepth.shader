@@ -40,12 +40,12 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float d = Linear01Depth(tex2D(_CameraDepthTexture, i.uv).r);
+                float d = Linear01Depth(tex2D(_CameraDepthTexture, i.uv).r) * 0xFFFFFF;
                 fixed4 col;
 
-                col.r = d;
-                col.g = fmod(d*256, 1);
-                col.b = fmod(d*256*256, 1);
+                col.r = floor(fmod(d/0x10000, 0xFF)) / 255.0;
+                col.g = floor(fmod(d/0x100, 0xFF)) / 255.0;
+                col.b = floor(fmod(d, 0xFF)) / 255.0;
 
                 return col;
             }

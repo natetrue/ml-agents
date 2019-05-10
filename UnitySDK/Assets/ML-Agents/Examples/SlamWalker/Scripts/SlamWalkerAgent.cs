@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -17,12 +18,26 @@ public class SlamWalkerAgent : Agent
     
     private CollisionFlags lastMoveCollisionFlags;
 
+    public TextAsset locationList;
+    private List<Vector3> resetLocations;
+
     public override void InitializeAgent()
     {
         base.InitializeAgent();
         myArea = area.GetComponent<SlamWalkerArea>();
         rayPer = GetComponent<RayPerception>();
         charCon = GetComponent<CharacterController>();
+
+
+        string[] fLines = Regex.Split ( locationList.text, "\n|\r|\r\n" );
+        resetLocations = new List<Vector3>(fLines.Length);
+        var commaRE = new Regex(",");
+        for ( int i=0; i < fLines.Length; i++ ) 
+        { 
+            string[] values = commaRE.Split ( fLines[i] );
+            var loc = new Vector3(float.Parse(values[0]), float.Parse(values[1]), float.Parse(values[2]));
+            resetLocations.Add(loc);
+        }
     }
 
     public override void CollectObservations()
@@ -73,23 +88,22 @@ public class SlamWalkerAgent : Agent
 
     public override void AgentAction(float[] vectorAction, string textAction)
     {
+        if (vectorAction[3] > 0.5f) {
+            AgentReset();
+        }
         AddReward(-1f / agentParameters.maxStep);
         MoveAgent(vectorAction);
     }
 
     public override void AgentReset()
     {
-        int spawnPoint = Random.Range(1, area.transform.childCount);
-        Transform spawnTransform = area.transform.GetChild(spawnPoint);
+        int spawnPoint = Random.Range(1, resetLocations.Count);
+        Vector3 spawnVec = resetLocations[spawnPoint];
 
-        Debug.LogWarning(String.Format("Choosing spawn point {0} at {1}", spawnPoint, spawnTransform), spawnTransform);
-
-        var xRange = spawnTransform.localScale.x / 2.1f;
-        var zRange = spawnTransform.localScale.z / 2.1f;
+        Debug.LogWarning(String.Format("Choosing spawn point {0} at {1}", spawnPoint, spawnVec));
 
         charCon.enabled = false;
-        transform.position = new Vector3(Random.Range(-xRange, xRange), 1f, Random.Range(-zRange, zRange))
-                                            + spawnTransform.position;
+        transform.position = spawnVec;
         transform.rotation = Quaternion.Euler(new Vector3(0f, Random.Range(0, 360)));
         charCon.enabled = true;
 
@@ -97,8 +111,9 @@ public class SlamWalkerAgent : Agent
         charCon.Move(transform.up * -100);
 
         // And wander in some direction and turn some other direction
-        charCon.Move(transform.forward * Random.Range(0.0f, 5.0f));
+        charCon.Move(transform.forward * Random.Range(0.0f, 1.0f));
         transform.rotation = Quaternion.Euler(new Vector3(0f, Random.Range(0, 360)));
+        // transform.rotation = Quaternion.Euler(new Vector3(0f, 30f, 0f));
 
         // switchLogic.ResetSwitch(items[1], items[2]);
         // myArea.CreateStoneSlamWalker(1, items[3]);
