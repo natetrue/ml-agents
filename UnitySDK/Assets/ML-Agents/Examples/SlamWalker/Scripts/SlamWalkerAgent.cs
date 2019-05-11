@@ -74,14 +74,27 @@ public class SlamWalkerAgent : Agent
 
         if (brain.brainParameters.vectorActionSpaceType == SpaceType.continuous)
         {
+            var prevPos = transform.position;
+
             lastMoveCollisionFlags = charCon.Move(
                 transform.forward * Mathf.Clamp(act[0], -1f, 1f) 
                 + transform.right * Mathf.Clamp(act[1], -1f, 1f) 
                 + transform.up * -0.5f
                 );
+
+            // Detect a fall and treat it like a collision
+            var prefallPosition = transform.position;
+            charCon.Move(transform.up * -100f);
+            if ((transform.position - prefallPosition).magnitude > 0.5) {
+                // Fell! Restore old position
+                charCon.enabled = false;
+                transform.position = prevPos;
+                charCon.enabled = true;
+                lastMoveCollisionFlags = CollisionFlags.Sides;
+            }
             
             rotateAmt = Mathf.Clamp(act[2], -1f, 1f) * 90f;
-            transform.Rotate(transform.up, rotateAmt);
+            transform.Rotate(transform.up, rotateAmt);            
         }
 
     }
