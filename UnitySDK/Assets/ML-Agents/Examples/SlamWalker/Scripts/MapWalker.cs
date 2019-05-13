@@ -68,14 +68,17 @@ public class MapWalker : MonoBehaviour
 
             // Check if succeeded
             if ((dest3 - transform.position).magnitude < granularity/2) {
+                var startElev = transform.position.y;
                 charCon.Move(new Vector3(0, -100, 0));
-                var v = new Vector2(transform.position.x, transform.position.z);
-                v.x = Mathf.Round(v.x / granularity) * granularity;
-                v.y = Mathf.Round(v.y / granularity) * granularity;
-                // Debug.LogWarning(String.Format("Visited {0}, {1} elev {2}", v.x, v.y, transform.position.y));
-                visitedPositions.Add(v);
-                fileWriter.WriteLine(String.Format("{0},{1},{2}", v.x, transform.position.y, v.y));
-                enqueueTravelFrom(transform);
+                if (transform.position.y > startElev - 0.5) {
+                    var v = new Vector2(transform.position.x, transform.position.z);
+                    v.x = Mathf.Round(v.x / granularity) * granularity;
+                    v.y = Mathf.Round(v.y / granularity) * granularity;
+                    // Debug.LogWarning(String.Format("Visited {0}, {1} elev {2}", v.x, v.y, transform.position.y));
+                    visitedPositions.Add(v);
+                    fileWriter.WriteLine(String.Format("{0},{1},{2}", v.x, transform.position.y, v.y));
+                    enqueueTravelFrom(transform);
+                }
             }
         }
     }
